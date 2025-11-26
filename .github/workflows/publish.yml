@@ -42,7 +42,7 @@ jobs:
       - name: Run tests
         run: |
           cd connectors/${{ matrix.connector }}
-          pytest tests/ -v -m generated
+          pytest tests/ -v
       - name: Build package
         run: python -m build connectors/${{ matrix.connector }}/
       - name: Publish to PyPI
