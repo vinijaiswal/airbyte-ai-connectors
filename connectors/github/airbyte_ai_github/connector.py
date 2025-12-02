@@ -1,0 +1,289 @@
+"""
+Auto-generated github connector. Do not edit manually.
+
+Generated from OpenAPI specification.
+"""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Optional, Any, Dict, overload, Self
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
+from pathlib import Path
+
+if TYPE_CHECKING:
+    from ._vendored.connector_sdk.executor import ExecutorProtocol
+    from .types import (
+        RepositoriesGetParams,
+        RepositoriesListParams,
+        RepositoriesSearchParams,
+    )
+
+
+class GithubConnector:
+    """
+    Type-safe Github API connector.
+
+    Auto-generated from OpenAPI specification with full type safety.
+    """
+
+    connector_name = "github"
+    connector_version = "1.0.0"
+    vendored_sdk_version = "0.1.0"  # Version of vendored connector-sdk
+
+    def __init__(self, executor: ExecutorProtocol):
+        """Initialize connector with an executor."""
+        self._executor = executor
+        self.repositories = RepositoriesQuery(self)
+
+    @classmethod
+    def create(
+        cls,
+        secrets: Optional[dict[str, str]] = None,
+        config_path: Optional[str] = None,
+        connector_id: Optional[str] = None,
+        airbyte_client_id: Optional[str] = None,
+        airbyte_client_secret: Optional[str] = None,
+        airbyte_connector_api_url: Optional[str] = None    ) -> Self:
+        """
+        Create a new github connector instance.
+
+        Supports both local and hosted execution modes:
+        - Local mode: Provide `secrets` for direct API calls
+        - Hosted mode: Provide `connector_id`, `airbyte_client_id`, and `airbyte_client_secret` for hosted execution
+
+        Args:
+            secrets: API secrets/credentials (required for local mode)
+            config_path: Optional path to connector config (uses bundled default if None)
+            connector_id: Connector ID (required for hosted mode)
+            airbyte_client_id: Airbyte OAuth client ID (required for hosted mode)
+            airbyte_client_secret: Airbyte OAuth client secret (required for hosted mode)
+        Returns:
+            Configured GithubConnector instance
+
+        Examples:
+            # Local mode (direct API calls)
+            connector = GithubConnector.create(secrets={"api_key": "sk_..."})
+
+            # Hosted mode (executed on Airbyte cloud)
+            connector = GithubConnector.create(
+                connector_id="connector-456",
+                airbyte_client_id="client_abc123",
+                airbyte_client_secret="secret_xyz789"
+            )
+        """
+        # Hosted mode: connector_id, airbyte_client_id, and airbyte_client_secret provided
+        if connector_id and airbyte_client_id and airbyte_client_secret:
+            from ._vendored.connector_sdk.executor import HostedExecutor
+            executor = HostedExecutor(
+                connector_id=connector_id,
+                airbyte_client_id=airbyte_client_id,
+                airbyte_client_secret=airbyte_client_secret,
+                api_url=airbyte_connector_api_url,
+            )
+            return cls(executor)
+
+        # Local mode: secrets required
+        if not secrets:
+            raise ValueError(
+                "Either provide (connector_id, airbyte_client_id, airbyte_client_secret) for hosted mode "
+                "or secrets for local mode"
+            )
+
+        from ._vendored.connector_sdk.executor import LocalExecutor
+
+        if not config_path:
+            config_path = str(cls.get_default_config_path())
+
+        executor = LocalExecutor(config_path=config_path, secrets=secrets)
+        connector = cls(executor)
+
+        # Update base_url with server variables if provided
+
+        return connector
+
+    @classmethod
+    def get_default_config_path(cls) -> Path:
+        """Get path to bundled connector config."""
+        return Path(__file__).parent / "connector.yaml"
+
+    # ===== TYPED EXECUTE METHOD (Recommended Interface) =====
+    @overload
+    async def execute(
+        self,
+        resource: Literal["repositories"],
+        verb: Literal["get"],
+        params: "RepositoriesGetParams"
+    ) -> "dict[str, Any]": ...
+    @overload
+    async def execute(
+        self,
+        resource: Literal["repositories"],
+        verb: Literal["list"],
+        params: "RepositoriesListParams"
+    ) -> "dict[str, Any]": ...
+    @overload
+    async def execute(
+        self,
+        resource: Literal["repositories"],
+        verb: Literal["search"],
+        params: "RepositoriesSearchParams"
+    ) -> "dict[str, Any]": ...
+
+    @overload
+    async def execute(
+        self,
+        resource: str,
+        verb: str,
+        params: Dict[str, Any]
+    ) -> Dict[str, Any]: ...
+
+    async def execute(
+        self,
+        resource: str,
+        verb: str,
+        params: Optional[Dict[str, Any]] = None
+    ) -> Any:
+        """
+        Execute a resource operation with full type safety.
+
+        This is the recommended interface for blessed connectors as it:
+        - Uses the same signature as non-blessed connectors
+        - Provides full IDE autocomplete for resource/verb/params
+        - Makes migration from generic to blessed connectors seamless
+
+        Args:
+            resource: Resource name (e.g., "customers")
+            verb: Operation verb (e.g., "create", "get", "list")
+            params: Operation parameters (typed based on resource+verb)
+
+        Returns:
+            Typed response based on the operation
+
+        Example:
+            customer = await connector.execute(
+                resource="customers",
+                verb="get",
+                params={"id": "cus_123"}
+            )
+        """
+        from ._vendored.connector_sdk.executor import ExecutionConfig
+
+        # Use ExecutionConfig for both local and hosted executors
+        config = ExecutionConfig(
+            resource=resource,
+            verb=verb,
+            params=params
+        )
+
+        result = await self._executor.execute(config)
+
+        if not result.success:
+            raise RuntimeError(f"Execution failed: {result.error}")
+
+        return result.data
+
+
+
+class RepositoriesQuery:
+    """
+    Query class for Repositories resource operations.
+    """
+
+    def __init__(self, connector: GithubConnector):
+        """Initialize query with connector reference."""
+        self._connector = connector
+
+    async def get(
+        self,
+        owner: str,
+        repo: str,
+        fields: Optional[list[str]] = None,
+        **kwargs
+    ) -> "dict[str, Any]":
+        """
+        Get a repository
+
+        Args:
+            owner: The account owner of the repository (username or organization)
+            repo: The name of the repository
+            fields: Optional array of field names to select.
+If not provided, uses default fields.
+
+            **kwargs: Additional parameters
+
+        Returns:
+            dict[str, Any]
+        """
+        params = {k: v for k, v in {
+            "owner": owner,
+            "repo": repo,
+            "fields": fields,
+            **kwargs
+        }.items() if v is not None}
+
+        return await self._connector.execute("repositories", "get", params)
+    async def list(
+        self,
+        username: str,
+        per_page: Optional[int] = None,
+        fields: Optional[list[str]] = None,
+        **kwargs
+    ) -> "dict[str, Any]":
+        """
+        List repositories for a user
+
+        Args:
+            username: The username of the user whose repositories to list
+            per_page: The number of results per page
+            fields: Optional array of field names to select.
+If not provided, uses default fields.
+
+            **kwargs: Additional parameters
+
+        Returns:
+            dict[str, Any]
+        """
+        params = {k: v for k, v in {
+            "username": username,
+            "per_page": per_page,
+            "fields": fields,
+            **kwargs
+        }.items() if v is not None}
+
+        return await self._connector.execute("repositories", "list", params)
+    async def search(
+        self,
+        query: str,
+        limit: Optional[int] = None,
+        fields: Optional[list[str]] = None,
+        **kwargs
+    ) -> "dict[str, Any]":
+        """
+        Search GitHub repositories using GraphQL
+
+        Args:
+            query: GitHub repository search query. Examples:
+- "language:python stars:>1000"
+- "topic:machine-learning"
+- "org:facebook is:public"
+
+            limit: Number of results to return
+            fields: Optional array of field names to select.
+If not provided, uses default fields.
+
+            **kwargs: Additional parameters
+
+        Returns:
+            dict[str, Any]
+        """
+        params = {k: v for k, v in {
+            "query": query,
+            "limit": limit,
+            "fields": fields,
+            **kwargs
+        }.items() if v is not None}
+
+        return await self._connector.execute("repositories", "search", params)
