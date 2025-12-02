@@ -1,4 +1,5 @@
 openapi: 3.1.0
+# Test: yaml change should trigger auto-bump from 0.0.1 to 0.0.2
 info:
   title: Stripe API Connector
   version: 0.0.1
