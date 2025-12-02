@@ -5,6 +5,12 @@ Generated from OpenAPI specification schemas.
 """
 from typing import TypedDict, NotRequired, Any
 
+# ===== AUTH CONFIG TYPE DEFINITIONS =====
+
+class LinearAuthConfig(TypedDict):
+    """Authentication"""
+    api_key: str  # API authentication key
+
 # ===== RESPONSE TYPE DEFINITIONS =====
 
 class Issue(TypedDict):
