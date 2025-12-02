@@ -1,0 +1,402 @@
+# Gong API Connector
+# OpenAPI 3.1 specification with Airbyte extensions
+
+openapi: 3.1.0
+
+info:
+  title: Gong API Connector
+  version: 1.0.0
+  description: Connector for Gong API
+  x-airbyte-connector-name: gong
+  x-airbyte-external-documentation-urls:
+    - type: api_reference
+      title: Gong API Documentation
+      url: https://gong.app.gong.io/settings/api/documentation
+
+servers:
+  - url: https://api.gong.io
+    description: Gong API server
+
+security:
+  - basicAuth: []
+
+paths:
+  "/v2/users":
+    get:
+      summary: List users
+      description: Returns a list of all users in the Gong account
+      operationId: listUsers
+      x-airbyte-resource: users
+      x-airbyte-verb: list
+      parameters:
+        - name: cursor
+          in: query
+          description: Cursor for pagination
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsersResponse"
+        "401":
+          description: Unauthorized
+
+  "/v2/users/{id}":
+    get:
+      summary: Get a user
+      description: Get a single user by ID
+      operationId: getUser
+      x-airbyte-resource: users
+      x-airbyte-verb: get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "404":
+          description: User not found
+        "401":
+          description: Unauthorized
+
+  "/v2/calls":
+    get:
+      summary: List calls
+      description: Retrieve calls data by date range
+      operationId: listCalls
+      x-airbyte-resource: calls
+      x-airbyte-verb: list
+      parameters:
+        - name: fromDateTime
+          in: query
+          description: Start date in ISO 8601 format
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: toDateTime
+          in: query
+          description: End date in ISO 8601 format
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: cursor
+          in: query
+          description: Cursor for pagination
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of calls
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CallsResponse"
+        "401":
+          description: Unauthorized
+
+  "/v2/calls/{id}":
+    get:
+      summary: Get a call
+      description: Get specific call data by ID
+      operationId: getCall
+      x-airbyte-resource: calls
+      x-airbyte-verb: get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Call ID
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Call object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CallResponse"
+        "404":
+          description: Call not found
+        "401":
+          description: Unauthorized
+
+  "/v2/workspaces":
+    get:
+      summary: List workspaces
+      description: List all company workspaces
+      operationId: listWorkspaces
+      x-airbyte-resource: workspaces
+      x-airbyte-verb: list
+      responses:
+        "200":
+          description: List of workspaces
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkspacesResponse"
+        "401":
+          description: Unauthorized
+
+  "/v2/calls/transcript":
+    post:
+      summary: Retrieve call transcripts
+      description: Returns transcripts for calls in a specified date range or specific call IDs
+      operationId: getCallTranscripts
+      x-airbyte-resource: call_transcripts
+      x-airbyte-verb: list
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filter:
+                  type: object
+                  properties:
+                    fromDateTime:
+                      type: string
+                      format: date-time
+                      description: Start date in ISO 8601 format (optional if callIds provided)
+                    toDateTime:
+                      type: string
+                      format: date-time
+                      description: End date in ISO 8601 format (optional if callIds provided)
+                    callIds:
+                      type: array
+                      items:
+                        type: string
+                      description: List of specific call IDs to retrieve transcripts for
+                cursor:
+                  type: string
+                  description: Cursor for pagination
+      responses:
+        "200":
+          description: Call transcripts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TranscriptsResponse"
+        "401":
+          description: Unauthorized
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Basic authentication using Access Key as username and Access Key Secret as password
+
+  schemas:
+    PaginationRecords:
+      type: object
+      description: Pagination metadata
+      properties:
+        totalRecords:
+          type: integer
+          description: Total number of records
+        currentPageSize:
+          type: integer
+          description: Number of records in current page
+        currentPageNumber:
+          type: integer
+          description: Current page number
+        cursor:
+          type: string
+          description: Cursor for next page
+
+    User:
+      type: object
+      x-airbyte-resource-name: users
+      description: User object
+      properties:
+        id:
+          type: string
+          description: Unique user identifier
+        emailAddress:
+          type: string
+          description: User email address
+        firstName:
+          type: string
+          description: User first name
+        lastName:
+          type: string
+          description: User last name
+        active:
+          type: boolean
+          description: Whether user is active
+        createdDate:
+          type: string
+          description: User creation date
+
+    UsersResponse:
+      type: object
+      description: Response containing list of users
+      properties:
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        records:
+          $ref: "#/components/schemas/PaginationRecords"
+        requestId:
+          type: string
+          description: Request identifier
+
+    UserResponse:
+      type: object
+      description: Response containing single user
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        requestId:
+          type: string
+          description: Request identifier
+
+    Call:
+      type: object
+      x-airbyte-resource-name: calls
+      description: Call object
+      properties:
+        id:
+          type: string
+          description: Unique call identifier
+        url:
+          type: string
+          description: URL to call in Gong
+        title:
+          type: string
+          description: Call title
+        started:
+          type: string
+          format: date-time
+          description: Call start time
+        duration:
+          type: integer
+          description: Call duration in seconds
+        primaryUserId:
+          type: string
+          description: Primary user ID
+        direction:
+          type: string
+          description: Call direction (inbound/outbound)
+        system:
+          type: string
+          description: System type
+        scope:
+          type: string
+          description: Call scope
+        language:
+          type: string
+          description: Call language
+
+    CallsResponse:
+      type: object
+      description: Response containing list of calls
+      properties:
+        calls:
+          type: array
+          items:
+            $ref: "#/components/schemas/Call"
+        records:
+          $ref: "#/components/schemas/PaginationRecords"
+        requestId:
+          type: string
+          description: Request identifier
+
+    CallResponse:
+      type: object
+      description: Response containing single call
+      properties:
+        call:
+          $ref: "#/components/schemas/Call"
+        requestId:
+          type: string
+          description: Request identifier
+
+    Workspace:
+      type: object
+      x-airbyte-resource-name: workspaces
+      description: Workspace object
+      properties:
+        workspaceId:
+          type: string
+          description: Unique workspace identifier
+        name:
+          type: string
+          description: Workspace name
+
+    WorkspacesResponse:
+      type: object
+      description: Response containing list of workspaces
+      properties:
+        workspaces:
+          type: array
+          items:
+            $ref: "#/components/schemas/Workspace"
+        requestId:
+          type: string
+          description: Request identifier
+
+    CallTranscript:
+      type: object
+      x-airbyte-resource-name: call_transcripts
+      description: Call transcript object
+      properties:
+        callId:
+          type: string
+          description: Call identifier
+        transcript:
+          type: array
+          items:
+            type: object
+            properties:
+              speakerId:
+                type: string
+                description: Speaker identifier
+              topic:
+                type: ["string", "null"]
+                description: Topic
+              sentences:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    start:
+                      type: integer
+                      description: Start time in seconds
+                    end:
+                      type: integer
+                      description: End time in seconds
+                    text:
+                      type: string
+                      description: Sentence text
+
+    TranscriptsResponse:
+      type: object
+      description: Response containing call transcripts
+      properties:
+        callTranscripts:
+          type: array
+          items:
+            $ref: "#/components/schemas/CallTranscript"
+        records:
+          $ref: "#/components/schemas/PaginationRecords"
+        requestId:
+          type: string
+          description: Request identifier
