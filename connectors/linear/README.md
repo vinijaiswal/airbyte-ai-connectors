@@ -16,7 +16,7 @@ uv pip install airbyte-ai-linear
 from airbyte_ai_linear import LinearConnector
 
 # Create connector
-connector = LinearConnector.create(secrets={"api_key": "your_api_key"})
+connector = LinearConnector.create(auth_config={"api_key": "your_api_key"})
 
 # Use typed methods with full IDE autocomplete
 # (See Available Operations below for all methods)

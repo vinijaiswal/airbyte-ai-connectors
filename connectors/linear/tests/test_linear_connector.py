@@ -6,8 +6,8 @@ from airbyte_ai_linear import LinearConnector
 
 
 def test_connector_creation():
-    """Test creating LinearConnector instance."""
-    connector = LinearConnector.create(secrets={"api_key": "test_key"})
+    """Test creating LinearConnector instance with Authentication."""
+    connector = LinearConnector.create(auth_config={"api_key": "test_api_key"})
     assert connector.connector_name == "linear"
     assert connector.connector_version
 
