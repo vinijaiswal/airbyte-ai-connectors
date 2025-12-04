@@ -11,10 +11,7 @@ try:
     from typing import Literal
 except ImportError:
     from typing_extensions import Literal
-
 from pathlib import Path
-
-from ._vendored.connector_sdk import save_download
 
 if TYPE_CHECKING:
     from .types import (
@@ -45,6 +42,16 @@ class LinearConnector:
     connector_version = "1.0.0"
     vendored_sdk_version = "0.1.0"  # Version of vendored connector-sdk
 
+    # Map of (entity, action) -> has_extractors for envelope wrapping decision
+    _EXTRACTOR_MAP = {
+        ("issues", "list"): False,
+        ("issues", "get"): False,
+        ("projects", "list"): False,
+        ("projects", "get"): False,
+        ("teams", "list"): False,
+        ("teams", "get"): False,
+    }
+
     def __init__(
         self,
         auth_config: LinearAuthConfig | None = None,
@@ -67,7 +74,6 @@ class LinearConnector:
             connector_id: Connector ID (required for hosted mode)
             airbyte_client_id: Airbyte OAuth client ID (required for hosted mode)
             airbyte_client_secret: Airbyte OAuth client secret (required for hosted mode)
-            airbyte_connector_api_url: Airbyte connector API URL (defaults to Airbyte Cloud API URL)
             on_token_refresh: Optional callback for OAuth2 token refresh persistence.
                 Called with new_tokens dict when tokens are refreshed. Can be sync or async.
                 Example: lambda tokens: save_to_database(tokens)
@@ -137,7 +143,6 @@ class LinearConnector:
         return Path(__file__).parent / "connector.yaml"
 
     # ===== TYPED EXECUTE METHOD (Recommended Interface) =====
-
     @overload
     async def execute(
         self,
@@ -145,7 +150,6 @@ class LinearConnector:
         action: Literal["list"],
         params: "IssuesListParams"
     ) -> "IssuesListResponse": ...
-
     @overload
     async def execute(
         self,
@@ -153,7 +157,6 @@ class LinearConnector:
         action: Literal["get"],
         params: "IssuesGetParams"
     ) -> "IssueResponse": ...
-
     @overload
     async def execute(
         self,
@@ -161,7 +164,6 @@ class LinearConnector:
         action: Literal["list"],
         params: "ProjectsListParams"
     ) -> "ProjectsListResponse": ...
-
     @overload
     async def execute(
         self,
@@ -169,7 +171,6 @@ class LinearConnector:
         action: Literal["get"],
         params: "ProjectsGetParams"
     ) -> "ProjectResponse": ...
-
     @overload
     async def execute(
         self,
@@ -177,7 +178,6 @@ class LinearConnector:
         action: Literal["list"],
         params: "TeamsListParams"
     ) -> "TeamsListResponse": ...
-
     @overload
     async def execute(
         self,
@@ -185,7 +185,6 @@ class LinearConnector:
         action: Literal["get"],
         params: "TeamsGetParams"
     ) -> "TeamResponse": ...
-
 
     @overload
     async def execute(
@@ -238,7 +237,18 @@ class LinearConnector:
         if not result.success:
             raise RuntimeError(f"Execution failed: {result.error}")
 
-        return result.data
+        # Check if this operation has extractors configured
+        has_extractors = self._EXTRACTOR_MAP.get((entity, action), False)
+
+        if has_extractors:
+            # With extractors - return envelope with data and meta
+            envelope: dict[str, Any] = {"data": result.data}
+            if result.meta is not None:
+                envelope["meta"] = result.meta
+            return envelope
+        else:
+            # No extractors - return raw response data
+            return result.data
 
 
 
@@ -256,7 +266,7 @@ class IssuesQuery:
         first: int | None = None,
         after: str | None = None,
         **kwargs
-    ) -> IssuesListResponse:
+    ) -> "IssuesListResponse":
         """
         List issues
 
@@ -275,14 +285,11 @@ class IssuesQuery:
         }.items() if v is not None}
 
         return await self._connector.execute("issues", "list", params)
-
-
-
     async def get(
         self,
         id: str | None = None,
         **kwargs
-    ) -> IssueResponse:
+    ) -> "IssueResponse":
         """
         Get an issue
 
@@ -299,9 +306,6 @@ class IssuesQuery:
         }.items() if v is not None}
 
         return await self._connector.execute("issues", "get", params)
-
-
-
 class ProjectsQuery:
     """
     Query class for Projects entity operations.
@@ -316,7 +320,7 @@ class ProjectsQuery:
         first: int | None = None,
         after: str | None = None,
         **kwargs
-    ) -> ProjectsListResponse:
+    ) -> "ProjectsListResponse":
         """
         List projects
 
@@ -335,14 +339,11 @@ class ProjectsQuery:
         }.items() if v is not None}
 
         return await self._connector.execute("projects", "list", params)
-
-
-
     async def get(
         self,
         id: str | None = None,
         **kwargs
-    ) -> ProjectResponse:
+    ) -> "ProjectResponse":
         """
         Get a project
 
@@ -359,9 +360,6 @@ class ProjectsQuery:
         }.items() if v is not None}
 
         return await self._connector.execute("projects", "get", params)
-
-
-
 class TeamsQuery:
     """
     Query class for Teams entity operations.
@@ -376,7 +374,7 @@ class TeamsQuery:
         first: int | None = None,
         after: str | None = None,
         **kwargs
-    ) -> TeamsListResponse:
+    ) -> "TeamsListResponse":
         """
         List teams
 
@@ -395,14 +393,11 @@ class TeamsQuery:
         }.items() if v is not None}
 
         return await self._connector.execute("teams", "list", params)
-
-
-
     async def get(
         self,
         id: str | None = None,
         **kwargs
-    ) -> TeamResponse:
+    ) -> "TeamResponse":
         """
         Get a team
 
@@ -419,5 +414,3 @@ class TeamsQuery:
         }.items() if v is not None}
 
         return await self._connector.execute("teams", "get", params)
-
-
