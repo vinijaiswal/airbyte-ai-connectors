@@ -9,6 +9,7 @@ info:
   version: 1.0.0
   description: Connector for Linear GraphQL API
   x-airbyte-connector-name: linear
+  x-airbyte-connector-id: 1c5d8316-ed42-4473-8fbc-2626f03f070c
   x-airbyte-external-documentation-urls:
     - type: api_reference
       title: Linear API Getting Started Guide
