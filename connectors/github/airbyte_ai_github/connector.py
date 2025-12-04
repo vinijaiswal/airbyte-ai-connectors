@@ -67,7 +67,7 @@ class GithubConnector:
                 Example: lambda tokens: save_to_database(tokens)
         Examples:
             # Local mode (direct API calls)
-            connector = GithubConnector(auth_config={"api_key": "sk_..."})
+            connector = GithubConnector(auth_config={"access_token": "...", "refresh_token": "...", "client_id": "...", "client_secret": "..."})
             # Hosted mode (executed on Airbyte cloud)
             connector = GithubConnector(
                 connector_id="connector-456",
