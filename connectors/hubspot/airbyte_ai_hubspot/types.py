@@ -21,6 +21,15 @@ class Contact(TypedDict):
     updatedAt: NotRequired[str]
     archived: NotRequired[bool]
 
+class PagingNext(TypedDict):
+    """Nested schema for Paging.next"""
+    after: NotRequired[str]
+    link: NotRequired[str]
+
+class Paging(TypedDict):
+    """Pagination information"""
+    next: NotRequired[PagingNext]
+
 class ContactsList(TypedDict):
     """Paginated list of contacts"""
     results: NotRequired[list[Contact]]
@@ -65,11 +74,16 @@ class TicketsList(TypedDict):
     results: NotRequired[list[Ticket]]
     paging: NotRequired[Paging]
 
+class SchemaLabels(TypedDict):
+    """Display labels"""
+    singular: NotRequired[str]
+    plural: NotRequired[str]
+
 class Schema(TypedDict):
     """Custom object schema definition"""
     id: NotRequired[str]
     name: NotRequired[str]
-    labels: NotRequired[dict[str, Any]]
+    labels: NotRequired[SchemaLabels]
     objectTypeId: NotRequired[str]
     fullyQualifiedName: NotRequired[str]
     properties: NotRequired[list[dict[str, Any]]]
@@ -93,9 +107,7 @@ class ObjectsList(TypedDict):
     results: NotRequired[list[CRMObject]]
     paging: NotRequired[Paging]
 
-class Paging(TypedDict):
-    """Pagination information"""
-    next: NotRequired[dict[str, Any]]
+# ===== ENVELOPE TYPE DEFINITIONS =====
 
 # ===== OPERATION PARAMS TYPE DEFINITIONS =====
 
