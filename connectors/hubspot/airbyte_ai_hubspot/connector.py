@@ -11,10 +11,7 @@ try:
     from typing import Literal
 except ImportError:
     from typing_extensions import Literal
-
 from pathlib import Path
-
-from ._vendored.connector_sdk import save_download
 
 if TYPE_CHECKING:
     from .types import (
@@ -55,6 +52,21 @@ class HubspotConnector:
     connector_version = "1.0.0"
     vendored_sdk_version = "0.1.0"  # Version of vendored connector-sdk
 
+    # Map of (entity, action) -> has_extractors for envelope wrapping decision
+    _EXTRACTOR_MAP = {
+        ("contacts", "list"): False,
+        ("contacts", "get"): False,
+        ("companies", "list"): False,
+        ("companies", "get"): False,
+        ("deals", "list"): False,
+        ("deals", "get"): False,
+        ("tickets", "list"): False,
+        ("tickets", "get"): False,
+        ("schemas", "list"): False,
+        ("objects", "list"): False,
+        ("objects", "get"): False,
+    }
+
     def __init__(
         self,
         auth_config: HubspotAuthConfig | None = None,
@@ -77,7 +89,6 @@ class HubspotConnector:
             connector_id: Connector ID (required for hosted mode)
             airbyte_client_id: Airbyte OAuth client ID (required for hosted mode)
             airbyte_client_secret: Airbyte OAuth client secret (required for hosted mode)
-            airbyte_connector_api_url: Airbyte connector API URL (defaults to Airbyte Cloud API URL)
             on_token_refresh: Optional callback for OAuth2 token refresh persistence.
                 Called with new_tokens dict when tokens are refreshed. Can be sync or async.
                 Example: lambda tokens: save_to_database(tokens)
@@ -150,7 +161,6 @@ class HubspotConnector:
         return Path(__file__).parent / "connector.yaml"
 
     # ===== TYPED EXECUTE METHOD (Recommended Interface) =====
-
     @overload
     async def execute(
         self,
@@ -158,7 +168,6 @@ class HubspotConnector:
         action: Literal["list"],
         params: "ContactsListParams"
     ) -> "ContactsList": ...
-
     @overload
     async def execute(
         self,
@@ -166,7 +175,6 @@ class HubspotConnector:
         action: Literal["get"],
         params: "ContactsGetParams"
     ) -> "Contact": ...
-
     @overload
     async def execute(
         self,
@@ -174,7 +182,6 @@ class HubspotConnector:
         action: Literal["list"],
         params: "CompaniesListParams"
     ) -> "CompaniesList": ...
-
     @overload
     async def execute(
         self,
@@ -182,7 +189,6 @@ class HubspotConnector:
         action: Literal["get"],
         params: "CompaniesGetParams"
     ) -> "Company": ...
-
     @overload
     async def execute(
         self,
@@ -190,7 +196,6 @@ class HubspotConnector:
         action: Literal["list"],
         params: "DealsListParams"
     ) -> "DealsList": ...
-
     @overload
     async def execute(
         self,
@@ -198,7 +203,6 @@ class HubspotConnector:
         action: Literal["get"],
         params: "DealsGetParams"
     ) -> "Deal": ...
-
     @overload
     async def execute(
         self,
@@ -206,7 +210,6 @@ class HubspotConnector:
         action: Literal["list"],
         params: "TicketsListParams"
     ) -> "TicketsList": ...
-
     @overload
     async def execute(
         self,
@@ -214,7 +217,6 @@ class HubspotConnector:
         action: Literal["get"],
         params: "TicketsGetParams"
     ) -> "Ticket": ...
-
     @overload
     async def execute(
         self,
@@ -222,7 +224,6 @@ class HubspotConnector:
         action: Literal["list"],
         params: "SchemasListParams"
     ) -> "SchemasList": ...
-
     @overload
     async def execute(
         self,
@@ -230,7 +231,6 @@ class HubspotConnector:
         action: Literal["list"],
         params: "ObjectsListParams"
     ) -> "ObjectsList": ...
-
     @overload
     async def execute(
         self,
@@ -238,7 +238,6 @@ class HubspotConnector:
         action: Literal["get"],
         params: "ObjectsGetParams"
     ) -> "CRMObject": ...
-
 
     @overload
     async def execute(
@@ -291,7 +290,18 @@ class HubspotConnector:
         if not result.success:
             raise RuntimeError(f"Execution failed: {result.error}")
 
-        return result.data
+        # Check if this operation has extractors configured
+        has_extractors = self._EXTRACTOR_MAP.get((entity, action), False)
+
+        if has_extractors:
+            # With extractors - return envelope with data and meta
+            envelope: dict[str, Any] = {"data": result.data}
+            if result.meta is not None:
+                envelope["meta"] = result.meta
+            return envelope
+        else:
+            # No extractors - return raw response data
+            return result.data
 
 
 
@@ -311,7 +321,7 @@ class ContactsQuery:
         properties: str | None = None,
         archived: bool | None = None,
         **kwargs
-    ) -> ContactsList:
+    ) -> "ContactsList":
         """
         List contacts
 
@@ -334,20 +344,17 @@ class ContactsQuery:
         }.items() if v is not None}
 
         return await self._connector.execute("contacts", "list", params)
-
-
-
     async def get(
         self,
-        contact_id: str,
+        contactId: str,
         properties: str | None = None,
         **kwargs
-    ) -> Contact:
+    ) -> "Contact":
         """
         Get a contact
 
         Args:
-            contact_id: Contact ID
+            contactId: Contact ID
             properties: Comma-separated list of properties to include
             **kwargs: Additional parameters
 
@@ -361,9 +368,6 @@ class ContactsQuery:
         }.items() if v is not None}
 
         return await self._connector.execute("contacts", "get", params)
-
-
-
 class CompaniesQuery:
     """
     Query class for Companies entity operations.
@@ -380,7 +384,7 @@ class CompaniesQuery:
         properties: str | None = None,
         archived: bool | None = None,
         **kwargs
-    ) -> CompaniesList:
+    ) -> "CompaniesList":
         """
         List companies
 
@@ -403,20 +407,17 @@ class CompaniesQuery:
         }.items() if v is not None}
 
         return await self._connector.execute("companies", "list", params)
-
-
-
     async def get(
         self,
-        company_id: str,
+        companyId: str,
         properties: str | None = None,
         **kwargs
-    ) -> Company:
+    ) -> "Company":
         """
         Get a company
 
         Args:
-            company_id: Company ID
+            companyId: Company ID
             properties: Comma-separated list of properties to include
             **kwargs: Additional parameters
 
@@ -430,9 +431,6 @@ class CompaniesQuery:
         }.items() if v is not None}
 
         return await self._connector.execute("companies", "get", params)
-
-
-
 class DealsQuery:
     """
     Query class for Deals entity operations.
@@ -449,7 +447,7 @@ class DealsQuery:
         properties: str | None = None,
         archived: bool | None = None,
         **kwargs
-    ) -> DealsList:
+    ) -> "DealsList":
         """
         List deals
 
@@ -472,20 +470,17 @@ class DealsQuery:
         }.items() if v is not None}
 
         return await self._connector.execute("deals", "list", params)
-
-
-
     async def get(
         self,
-        deal_id: str,
+        dealId: str,
         properties: str | None = None,
         **kwargs
-    ) -> Deal:
+    ) -> "Deal":
         """
         Get a deal
 
         Args:
-            deal_id: Deal ID
+            dealId: Deal ID
             properties: Comma-separated list of properties to include
             **kwargs: Additional parameters
 
@@ -499,9 +494,6 @@ class DealsQuery:
         }.items() if v is not None}
 
         return await self._connector.execute("deals", "get", params)
-
-
-
 class TicketsQuery:
     """
     Query class for Tickets entity operations.
@@ -518,7 +510,7 @@ class TicketsQuery:
         properties: str | None = None,
         archived: bool | None = None,
         **kwargs
-    ) -> TicketsList:
+    ) -> "TicketsList":
         """
         List tickets
 
@@ -541,20 +533,17 @@ class TicketsQuery:
         }.items() if v is not None}
 
         return await self._connector.execute("tickets", "list", params)
-
-
-
     async def get(
         self,
-        ticket_id: str,
+        ticketId: str,
         properties: str | None = None,
         **kwargs
-    ) -> Ticket:
+    ) -> "Ticket":
         """
         Get a ticket
 
         Args:
-            ticket_id: Ticket ID
+            ticketId: Ticket ID
             properties: Comma-separated list of properties to include
             **kwargs: Additional parameters
 
@@ -568,9 +557,6 @@ class TicketsQuery:
         }.items() if v is not None}
 
         return await self._connector.execute("tickets", "get", params)
-
-
-
 class SchemasQuery:
     """
     Query class for Schemas entity operations.
@@ -583,7 +569,7 @@ class SchemasQuery:
     async def list(
         self,
         **kwargs
-    ) -> SchemasList:
+    ) -> "SchemasList":
         """
         List custom object schemas
 
@@ -595,9 +581,6 @@ class SchemasQuery:
         }.items() if v is not None}
 
         return await self._connector.execute("schemas", "list", params)
-
-
-
 class ObjectsQuery:
     """
     Query class for Objects entity operations.
@@ -609,18 +592,18 @@ class ObjectsQuery:
 
     async def list(
         self,
-        object_type: str,
+        objectType: str,
         limit: int | None = None,
         after: str | None = None,
         properties: str | None = None,
         archived: bool | None = None,
         **kwargs
-    ) -> ObjectsList:
+    ) -> "ObjectsList":
         """
         List objects
 
         Args:
-            object_type: Object type ID or fully qualified name (e.g., "cars" or "p12345_cars")
+            objectType: Object type ID or fully qualified name (e.g., "cars" or "p12345_cars")
             limit: Number of items to return per page
             after: Pagination cursor for next page
             properties: Comma-separated list of properties to include
@@ -640,22 +623,19 @@ class ObjectsQuery:
         }.items() if v is not None}
 
         return await self._connector.execute("objects", "list", params)
-
-
-
     async def get(
         self,
-        object_type: str,
-        object_id: str,
+        objectType: str,
+        objectId: str,
         properties: str | None = None,
         **kwargs
-    ) -> CRMObject:
+    ) -> "CRMObject":
         """
         Get an object
 
         Args:
-            object_type: Object type ID or fully qualified name
-            object_id: Object record ID
+            objectType: Object type ID or fully qualified name
+            objectId: Object record ID
             properties: Comma-separated list of properties to include
             **kwargs: Additional parameters
 
@@ -670,5 +650,3 @@ class ObjectsQuery:
         }.items() if v is not None}
 
         return await self._connector.execute("objects", "get", params)
-
-

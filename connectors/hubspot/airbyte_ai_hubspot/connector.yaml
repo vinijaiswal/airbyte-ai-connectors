@@ -8,6 +8,7 @@ info:
   version: 1.0.0
   description: Connector for HubSpot CRM API
   x-airbyte-connector-name: hubspot
+  x-airbyte-connector-id: 36c891d9-4bd9-43ac-bad2-10e12756272c
   x-airbyte-external-documentation-urls:
     - type: api_reference
       title: HubSpot API Documentation
