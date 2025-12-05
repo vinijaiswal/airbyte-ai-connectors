@@ -18,6 +18,7 @@ uv pip install airbyte-ai-gong
 
 ```python
 from airbyte_ai_gong import GongConnector
+from airbyte_ai_gong.models import GongAuthConfig
 
 # Create connector
 connector = GongConnector(
