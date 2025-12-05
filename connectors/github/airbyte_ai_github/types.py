@@ -1,18 +1,24 @@
 """
 Type definitions for github connector.
 """
-from typing import TypedDict, NotRequired, Any
+# Use typing_extensions.TypedDict for Pydantic compatibility on Python < 3.12
+try:
+    from typing_extensions import TypedDict, NotRequired
+except ImportError:
+    from typing import TypedDict, NotRequired  # type: ignore[attr-defined]
 
-# ===== AUTH CONFIG TYPE DEFINITIONS =====
-
-class GithubAuthConfig(TypedDict):
-    """Authentication"""
-    access_token: str  # OAuth2 access token
-    refresh_token: NotRequired[str]  # OAuth2 refresh token (optional)
-    client_id: NotRequired[str]  # OAuth2 client ID (optional)
-    client_secret: NotRequired[str]  # OAuth2 client secret (optional)
+from typing import Any
 
 # ===== RESPONSE TYPE DEFINITIONS =====
+
+class RepositoryLicense(TypedDict):
+    """Repository license information"""
+    key: NotRequired[str]
+    name: NotRequired[str]
+    url: NotRequired[str | None]
+    spdx_id: NotRequired[str | None]
+    node_id: NotRequired[str]
+    html_url: NotRequired[str | None]
 
 class RepositoryPermissions(TypedDict):
     """User permissions for the repository"""
@@ -41,14 +47,9 @@ class RepositoryOwner(TypedDict):
     type: NotRequired[str]
     site_admin: NotRequired[bool]
 
-class RepositoryLicense(TypedDict):
-    """Repository license information"""
-    key: NotRequired[str]
-    name: NotRequired[str]
-    url: NotRequired[str | None]
-    spdx_id: NotRequired[str | None]
-    node_id: NotRequired[str]
-    html_url: NotRequired[str | None]
+class RepositorySecurityAndAnalysisSecretScanning(TypedDict):
+    """Nested schema for RepositorySecurityAndAnalysis.secret_scanning"""
+    status: NotRequired[str]
 
 class RepositorySecurityAndAnalysisSecretScanningPushProtection(TypedDict):
     """Nested schema for RepositorySecurityAndAnalysis.secret_scanning_push_protection"""
@@ -56,10 +57,6 @@ class RepositorySecurityAndAnalysisSecretScanningPushProtection(TypedDict):
 
 class RepositorySecurityAndAnalysisAdvancedSecurity(TypedDict):
     """Nested schema for RepositorySecurityAndAnalysis.advanced_security"""
-    status: NotRequired[str]
-
-class RepositorySecurityAndAnalysisSecretScanning(TypedDict):
-    """Nested schema for RepositorySecurityAndAnalysis.secret_scanning"""
     status: NotRequired[str]
 
 class RepositorySecurityAndAnalysis(TypedDict):
@@ -163,7 +160,8 @@ class Repository(TypedDict):
     security_and_analysis: NotRequired[RepositorySecurityAndAnalysis | None]
     temp_clone_token: NotRequired[str | None]
 
-# ===== ENVELOPE TYPE DEFINITIONS =====
+# ===== METADATA TYPE DEFINITIONS =====
+# Meta types for operations that extract metadata (e.g., pagination info)
 
 # ===== OPERATION PARAMS TYPE DEFINITIONS =====
 

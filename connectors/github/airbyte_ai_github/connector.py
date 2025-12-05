@@ -12,13 +12,20 @@ except ImportError:
 
 from pathlib import Path
 
+from .types import (
+    RepositoriesGetParams,
+    RepositoriesListParams,
+    RepositoriesSearchParams,
+)
+
 if TYPE_CHECKING:
-    from .types import (
-        RepositoriesGetParams,
-        RepositoriesListParams,
-        RepositoriesSearchParams,
-        GithubAuthConfig,
-    )
+    from .models import GithubAuthConfig
+
+# Import envelope models at runtime (needed for instantiation in action methods)
+from .models import (
+    GithubExecuteResult,
+    GithubExecuteResultWithMeta,
+)
 
 
 class GithubConnector:
@@ -29,7 +36,7 @@ class GithubConnector:
     """
 
     connector_name = "github"
-    connector_version = "1.0.0"
+    connector_version = "0.1.0"
     vendored_sdk_version = "0.1.0"  # Version of vendored connector-sdk
 
     # Map of (entity, action) -> has_extractors for envelope wrapping decision
@@ -67,7 +74,7 @@ class GithubConnector:
                 Example: lambda tokens: save_to_database(tokens)
         Examples:
             # Local mode (direct API calls)
-            connector = GithubConnector(auth_config={"access_token": "...", "refresh_token": "...", "client_id": "...", "client_secret": "..."})
+            connector = GithubConnector(auth_config=GithubAuthConfig(access_token="...", refresh_token="...", client_id="...", client_secret="..."))
             # Hosted mode (executed on Airbyte cloud)
             connector = GithubConnector(
                 connector_id="connector-456",
@@ -82,7 +89,7 @@ class GithubConnector:
                     json.dump(new_tokens, f)
 
             connector = GithubConnector(
-                auth_config={"access_token": "...", "refresh_token": "..."},
+                auth_config=GithubAuthConfig(access_token="...", refresh_token="..."),
                 on_token_refresh=save_tokens
             )
         """
@@ -113,7 +120,7 @@ class GithubConnector:
 
             self._executor = LocalExecutor(
                 config_path=config_path,
-                auth_config=auth_config,
+                auth_config=auth_config.model_dump() if auth_config else None,
                 config_values=config_values,
                 on_token_refresh=on_token_refresh
             )
@@ -161,7 +168,7 @@ class GithubConnector:
         entity: str,
         action: str,
         params: dict[str, Any]
-    ) -> dict[str, Any]: ...
+    ) -> GithubExecuteResult[Any] | GithubExecuteResultWithMeta[Any, Any] | Any: ...
 
     async def execute(
         self,
@@ -210,11 +217,14 @@ class GithubConnector:
         has_extractors = self._EXTRACTOR_MAP.get((entity, action), False)
 
         if has_extractors:
-            # With extractors - return envelope with data and meta
-            envelope: dict[str, Any] = {"data": result.data}
+            # With extractors - return Pydantic envelope with data and meta
             if result.meta is not None:
-                envelope["meta"] = result.meta
-            return envelope
+                return GithubExecuteResultWithMeta[Any, Any](
+                    data=result.data,
+                    meta=result.meta
+                )
+            else:
+                return GithubExecuteResult[Any](data=result.data)
         else:
             # No extractors - return raw response data
             return result.data
@@ -258,7 +268,8 @@ If not provided, uses default fields.
             **kwargs
         }.items() if v is not None}
 
-        return await self._connector.execute("repositories", "get", params)
+        result = await self._connector.execute("repositories", "get", params)
+        return result
 
 
 
@@ -290,7 +301,8 @@ If not provided, uses default fields.
             **kwargs
         }.items() if v is not None}
 
-        return await self._connector.execute("repositories", "list", params)
+        result = await self._connector.execute("repositories", "list", params)
+        return result
 
 
 
@@ -328,6 +340,7 @@ If not provided, uses default fields.
             **kwargs
         }.items() if v is not None}
 
-        return await self._connector.execute("repositories", "search", params)
+        result = await self._connector.execute("repositories", "search", params)
+        return result
 
 
