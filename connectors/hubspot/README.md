@@ -2,7 +2,7 @@
 
 Type-safe Hubspot API connector with full IDE autocomplete support for AI applications.
 
-**Package Version:** 0.12.0
+**Package Version:** 0.13.0
 
 **Connector Version:** 0.1.0
 
@@ -18,9 +18,10 @@ uv pip install airbyte-ai-hubspot
 
 ```python
 from airbyte_ai_hubspot import HubspotConnector
+from airbyte_ai_hubspot.models import HubspotAuthConfig
 
 # Create connector
-connector = HubspotConnector(auth_config={"api_key": "your_api_key"})
+connector = HubspotConnector(auth_config=HubspotAuthConfig(access_token="..."))
 
 # Use typed methods with full IDE autocomplete
 # (See Available Operations below for all methods)
