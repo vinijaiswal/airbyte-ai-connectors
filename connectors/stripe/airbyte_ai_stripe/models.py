@@ -7,9 +7,8 @@ and response envelope types.
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, SkipValidation
-from typing import TypeVar, Generic
-
+from pydantic import BaseModel, ConfigDict, Field
+from typing import TypeVar, Generic, Union, Any
 
 # Authentication configuration
 
@@ -20,6 +19,47 @@ class StripeAuthConfig(BaseModel):
 
     token: str
     """Authentication bearer token"""
+
+# ===== RESPONSE TYPE DEFINITIONS (PYDANTIC) =====
+
+class CustomerAddress(BaseModel):
+    """Customer's address"""
+    model_config = ConfigDict(extra="allow", populate_by_name=True)
+
+    line1: Union[str, Any] = Field(default=None)
+    line2: Union[str, Any] = Field(default=None)
+    city: Union[str, Any] = Field(default=None)
+    state: Union[str, Any] = Field(default=None)
+    postal_code: Union[str, Any] = Field(default=None)
+    country: Union[str, Any] = Field(default=None)
+
+class Customer(BaseModel):
+    """Customer type definition"""
+    model_config = ConfigDict(extra="allow", populate_by_name=True)
+
+    id: Union[str, Any] = Field(default=None)
+    object: Union[str, Any] = Field(default=None)
+    email: Union[str, Any] = Field(default=None)
+    name: Union[str, Any] = Field(default=None)
+    description: Union[str, Any] = Field(default=None)
+    phone: Union[str, Any] = Field(default=None)
+    address: Union[CustomerAddress, Any] = Field(default=None)
+    metadata: Union[dict[str, str], Any] = Field(default=None)
+    created: Union[int, Any] = Field(default=None)
+    balance: Union[int, Any] = Field(default=None)
+    delinquent: Union[bool, Any] = Field(default=None)
+
+class CustomerList(BaseModel):
+    """CustomerList type definition"""
+    model_config = ConfigDict(extra="allow", populate_by_name=True)
+
+    object: Union[str, Any] = Field(default=None)
+    data: Union[list[Customer], Any] = Field(default=None)
+    has_more: Union[bool, Any] = Field(default=None)
+    url: Union[str, Any] = Field(default=None)
+
+# ===== METADATA TYPE DEFINITIONS (PYDANTIC) =====
+# Meta types for operations that extract metadata (e.g., pagination info)
 
 # ===== RESPONSE ENVELOPE MODELS =====
 
@@ -35,7 +75,7 @@ class StripeExecuteResult(BaseModel, Generic[T]):
     """
     model_config = ConfigDict(extra="forbid")
 
-    data: SkipValidation[T]
+    data: T
     """Response data containing the result of the action."""
 
 
@@ -44,7 +84,7 @@ class StripeExecuteResultWithMeta(StripeExecuteResult[T], Generic[T, S]):
 
     Used for actions that return both data and metadata (e.g., pagination info).
     """
-    meta: SkipValidation[S]
+    meta: S
     """Metadata about the response (e.g., pagination cursors, record counts)."""
 
 
