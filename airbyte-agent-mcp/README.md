@@ -16,15 +16,41 @@ MCP server that exposes the Airbyte Connector SDK as Model Context Protocol tool
 ```yaml
 # Connector definitions
 connectors:
+  # Load connector from the Airbyte registry (recommended)
   - id: stripe
     type: local
-    path: ../integrations/stripe/connector.yaml
+    connector_name: stripe
     description: "My Stripe API connector"
     secrets:
-      api_key: STRIPE_API_KEY
+      token: STRIPE_API_KEY
 ```
 
-`configured_connectors.yaml.example` contains an example of how to configure connectors.
+You can pin to a specific version from the registry:
+
+```yaml
+connectors:
+  - id: stripe
+    type: local
+    connector_name: stripe
+    version: 0.1.0
+    description: "Stripe connector pinned to v0.1.0"
+    secrets:
+      token: STRIPE_API_KEY
+```
+
+You can also load connectors from a local file path (version pinning not supported):
+
+```yaml
+connectors:
+  - id: my_api
+    type: local
+    path: ./connectors/my-api/connector.yaml
+    description: "My custom API connector"
+    secrets:
+      token: MY_API_KEY
+```
+
+See `configured_connectors.yaml.example` for more examples.
 
 ### 2. Create .env file
 
