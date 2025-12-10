@@ -240,6 +240,586 @@ paths:
         "401":
           description: Unauthorized
 
+  # ============ OFFERS ============
+  "/offers":
+    get:
+      summary: List offers
+      description: Returns a paginated list of all offers
+      operationId: listOffers
+      x-airbyte-entity: offers
+      x-airbyte-action: list
+      parameters:
+        - name: per_page
+          in: query
+          description: Number of items to return per page (max 500)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 100
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: created_before
+          in: query
+          description: Filter by offers created before this timestamp
+          schema:
+            type: string
+            format: date-time
+        - name: created_after
+          in: query
+          description: Filter by offers created after this timestamp
+          schema:
+            type: string
+            format: date-time
+        - name: resolved_after
+          in: query
+          description: Filter by offers resolved after this timestamp
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: List of offers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Offer"
+        "401":
+          description: Unauthorized
+
+  "/offers/{id}":
+    get:
+      summary: Get an offer
+      description: Get a single offer by ID
+      operationId: getOffer
+      x-airbyte-entity: offers
+      x-airbyte-action: get
+      x-airbyte-untested: true
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Offer ID
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Offer object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Offer"
+        "404":
+          description: Offer not found
+        "401":
+          description: Unauthorized
+
+  # ============ USERS ============
+  "/users":
+    get:
+      summary: List users
+      description: Returns a paginated list of all users
+      operationId: listUsers
+      x-airbyte-entity: users
+      x-airbyte-action: list
+      parameters:
+        - name: per_page
+          in: query
+          description: Number of items to return per page (max 500)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 100
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: created_before
+          in: query
+          description: Filter by users created before this timestamp
+          schema:
+            type: string
+            format: date-time
+        - name: created_after
+          in: query
+          description: Filter by users created after this timestamp
+          schema:
+            type: string
+            format: date-time
+        - name: updated_before
+          in: query
+          description: Filter by users updated before this timestamp
+          schema:
+            type: string
+            format: date-time
+        - name: updated_after
+          in: query
+          description: Filter by users updated after this timestamp
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+
+  "/users/{id}":
+    get:
+      summary: Get a user
+      description: Get a single user by ID
+      operationId: getUser
+      x-airbyte-entity: users
+      x-airbyte-action: get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+        "401":
+          description: Unauthorized
+
+  # ============ DEPARTMENTS ============
+  "/departments":
+    get:
+      summary: List departments
+      description: Returns a paginated list of all departments
+      operationId: listDepartments
+      x-airbyte-entity: departments
+      x-airbyte-action: list
+      parameters:
+        - name: per_page
+          in: query
+          description: Number of items to return per page (max 500)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 100
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+      responses:
+        "200":
+          description: List of departments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Department"
+        "401":
+          description: Unauthorized
+
+  "/departments/{id}":
+    get:
+      summary: Get a department
+      description: Get a single department by ID
+      operationId: getDepartment
+      x-airbyte-entity: departments
+      x-airbyte-action: get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Department ID
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Department object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Department"
+        "404":
+          description: Department not found
+        "401":
+          description: Unauthorized
+
+  # ============ OFFICES ============
+  "/offices":
+    get:
+      summary: List offices
+      description: Returns a paginated list of all offices
+      operationId: listOffices
+      x-airbyte-entity: offices
+      x-airbyte-action: list
+      parameters:
+        - name: per_page
+          in: query
+          description: Number of items to return per page (max 500)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 100
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+      responses:
+        "200":
+          description: List of offices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Office"
+        "401":
+          description: Unauthorized
+
+  "/offices/{id}":
+    get:
+      summary: Get an office
+      description: Get a single office by ID
+      operationId: getOffice
+      x-airbyte-entity: offices
+      x-airbyte-action: get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Office ID
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Office object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Office"
+        "404":
+          description: Office not found
+        "401":
+          description: Unauthorized
+
+  # ============ JOB POSTS ============
+  "/job_posts":
+    get:
+      summary: List job posts
+      description: Returns a paginated list of all job posts
+      operationId: listJobPosts
+      x-airbyte-entity: job_posts
+      x-airbyte-action: list
+      parameters:
+        - name: per_page
+          in: query
+          description: Number of items to return per page (max 500)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 100
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: live
+          in: query
+          description: Filter by live status
+          schema:
+            type: boolean
+        - name: active
+          in: query
+          description: Filter by active status
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of job posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/JobPost"
+        "401":
+          description: Unauthorized
+
+  "/job_posts/{id}":
+    get:
+      summary: Get a job post
+      description: Get a single job post by ID
+      operationId: getJobPost
+      x-airbyte-entity: job_posts
+      x-airbyte-action: get
+      x-airbyte-untested: true
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Job Post ID
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Job Post object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobPost"
+        "404":
+          description: Job Post not found
+        "401":
+          description: Unauthorized
+
+  # ============ SOURCES ============
+  "/sources":
+    get:
+      summary: List sources
+      description: Returns a paginated list of all sources
+      operationId: listSources
+      x-airbyte-entity: sources
+      x-airbyte-action: list
+      parameters:
+        - name: per_page
+          in: query
+          description: Number of items to return per page (max 500)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 100
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+      responses:
+        "200":
+          description: List of sources
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Source"
+        "401":
+          description: Unauthorized
+
+  # ============ SCHEDULED INTERVIEWS ============
+  "/scheduled_interviews":
+    get:
+      summary: List scheduled interviews
+      description: Returns a paginated list of all scheduled interviews
+      operationId: listScheduledInterviews
+      x-airbyte-entity: scheduled_interviews
+      x-airbyte-action: list
+      parameters:
+        - name: per_page
+          in: query
+          description: Number of items to return per page (max 500)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 100
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: created_before
+          in: query
+          description: Filter by interviews created before this timestamp
+          schema:
+            type: string
+            format: date-time
+        - name: created_after
+          in: query
+          description: Filter by interviews created after this timestamp
+          schema:
+            type: string
+            format: date-time
+        - name: updated_before
+          in: query
+          description: Filter by interviews updated before this timestamp
+          schema:
+            type: string
+            format: date-time
+        - name: updated_after
+          in: query
+          description: Filter by interviews updated after this timestamp
+          schema:
+            type: string
+            format: date-time
+        - name: starts_after
+          in: query
+          description: Filter by interviews starting after this timestamp
+          schema:
+            type: string
+            format: date-time
+        - name: ends_before
+          in: query
+          description: Filter by interviews ending before this timestamp
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: List of scheduled interviews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ScheduledInterview"
+        "401":
+          description: Unauthorized
+
+  "/scheduled_interviews/{id}":
+    get:
+      summary: Get a scheduled interview
+      description: Get a single scheduled interview by ID
+      operationId: getScheduledInterview
+      x-airbyte-entity: scheduled_interviews
+      x-airbyte-action: get
+      x-airbyte-untested: true
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Scheduled Interview ID
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Scheduled Interview object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScheduledInterview"
+        "404":
+          description: Scheduled Interview not found
+        "401":
+          description: Unauthorized
+
+  # ============ ATTACHMENT DOWNLOADS ============
+  "/applications/{id}/attachment:download/{attachment_index}":
+    get:
+      summary: Download application attachment
+      description: |
+        Downloads an attachment (resume, cover letter, etc.) for an application by index.
+        The attachment URL is a temporary signed AWS S3 URL that expires within 7 days.
+        Files should be downloaded immediately after retrieval.
+      operationId: downloadApplicationAttachment
+      x-airbyte-entity: application_attachment
+      x-airbyte-action: download
+      x-airbyte-file-url: attachments[{attachment_index}].url
+      x-airbyte-path-override:
+        path: /applications/{id}
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Application ID
+          schema:
+            type: integer
+        - name: attachment_index
+          in: path
+          required: true
+          description: Index of the attachment to download (0-based)
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        "200":
+          description: Application with attachment URLs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+        "404":
+          description: Application not found
+        "401":
+          description: Unauthorized
+
+  "/candidates/{id}/attachment:download/{attachment_index}":
+    get:
+      summary: Download candidate attachment
+      description: |
+        Downloads an attachment (resume, cover letter, etc.) for a candidate by index.
+        The attachment URL is a temporary signed AWS S3 URL that expires within 7 days.
+        Files should be downloaded immediately after retrieval.
+      operationId: downloadCandidateAttachment
+      x-airbyte-entity: candidate_attachment
+      x-airbyte-action: download
+      x-airbyte-file-url: attachments[{attachment_index}].url
+      x-airbyte-path-override:
+        path: /candidates/{id}
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Candidate ID
+          schema:
+            type: integer
+        - name: attachment_index
+          in: path
+          required: true
+          description: Index of the attachment to download (0-based)
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        "200":
+          description: Candidate with attachment URLs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Candidate"
+        "404":
+          description: Candidate not found
+        "401":
+          description: Unauthorized
+
 components:
   securitySchemes:
     basicAuth:
@@ -280,7 +860,7 @@ components:
           type: [string, "null"]
           description: Candidate's current company
         title:
-          type: string
+          type: [string, "null"]
           description: Candidate's current title
         created_at:
           type: string
@@ -303,8 +883,8 @@ components:
         attachments:
           type: array
           items:
-            type: object
-          description: Candidate attachments
+            $ref: "#/components/schemas/Attachment"
+          description: Candidate attachments (resumes, cover letters, etc.)
         application_ids:
           type: array
           items:
@@ -425,8 +1005,8 @@ components:
         attachments:
           type: array
           items:
-            type: object
-          description: Application attachments
+            $ref: "#/components/schemas/Attachment"
+          description: Application attachments (resumes, cover letters, etc.)
         custom_fields:
           type: object
           description: Custom field values
@@ -491,3 +1071,321 @@ components:
           items:
             type: object
           description: Job openings
+
+    Offer:
+      type: object
+      x-airbyte-entity-name: offers
+      description: Greenhouse offer object
+      properties:
+        id:
+          type: integer
+          description: Unique offer identifier
+        version:
+          type: integer
+          description: Offer version number
+        application_id:
+          type: integer
+          description: Associated application ID
+        job_id:
+          type: integer
+          description: Associated job ID
+        candidate_id:
+          type: integer
+          description: Associated candidate ID
+        opening:
+          type: [object, "null"]
+          description: Associated job opening
+        created_at:
+          type: string
+          format: date-time
+          description: When the offer was created
+        updated_at:
+          type: string
+          format: date-time
+          description: When the offer was last updated
+        sent_at:
+          type: [string, "null"]
+          format: date-time
+          description: When the offer was sent
+        resolved_at:
+          type: [string, "null"]
+          format: date-time
+          description: When the offer was resolved
+        starts_at:
+          type: [string, "null"]
+          description: Employment start date
+        status:
+          type: string
+          description: Offer status
+        custom_fields:
+          type: object
+          description: Custom field values
+
+    User:
+      type: object
+      x-airbyte-entity-name: users
+      description: Greenhouse user object
+      properties:
+        id:
+          type: integer
+          description: Unique user identifier
+        name:
+          type: string
+          description: User's full name
+        first_name:
+          type: string
+          description: User's first name
+        last_name:
+          type: string
+          description: User's last name
+        primary_email_address:
+          type: string
+          format: email
+          description: User's primary email address
+        updated_at:
+          type: string
+          format: date-time
+          description: When the user was last updated
+        created_at:
+          type: string
+          format: date-time
+          description: When the user was created
+        disabled:
+          type: boolean
+          description: Whether the user is disabled
+        site_admin:
+          type: boolean
+          description: Whether the user is a site admin
+        emails:
+          type: array
+          items:
+            type: string
+          description: All user email addresses
+        employee_id:
+          type: [string, "null"]
+          description: Employee ID
+        linked_candidate_ids:
+          type: array
+          items:
+            type: integer
+          description: IDs of linked candidates
+        offices:
+          type: array
+          items:
+            type: object
+          description: Associated offices
+        departments:
+          type: array
+          items:
+            type: object
+          description: Associated departments
+
+    Department:
+      type: object
+      x-airbyte-entity-name: departments
+      description: Greenhouse department object
+      properties:
+        id:
+          type: integer
+          description: Unique department identifier
+        name:
+          type: string
+          description: Department name
+        parent_id:
+          type: [integer, "null"]
+          description: Parent department ID
+        parent_department_external_id:
+          type: [string, "null"]
+          description: Parent department external ID
+        child_ids:
+          type: array
+          items:
+            type: integer
+          description: Child department IDs
+        child_department_external_ids:
+          type: array
+          items:
+            type: string
+          description: Child department external IDs
+        external_id:
+          type: [string, "null"]
+          description: External ID
+
+    Office:
+      type: object
+      x-airbyte-entity-name: offices
+      description: Greenhouse office object
+      properties:
+        id:
+          type: integer
+          description: Unique office identifier
+        name:
+          type: string
+          description: Office name
+        location:
+          type: [object, "null"]
+          description: Office location details
+        primary_contact_user_id:
+          type: [integer, "null"]
+          description: Primary contact user ID
+        parent_id:
+          type: [integer, "null"]
+          description: Parent office ID
+        parent_office_external_id:
+          type: [string, "null"]
+          description: Parent office external ID
+        child_ids:
+          type: array
+          items:
+            type: integer
+          description: Child office IDs
+        child_office_external_ids:
+          type: array
+          items:
+            type: string
+          description: Child office external IDs
+        external_id:
+          type: [string, "null"]
+          description: External ID
+
+    JobPost:
+      type: object
+      x-airbyte-entity-name: job_posts
+      description: Greenhouse job post object
+      properties:
+        id:
+          type: integer
+          description: Unique job post identifier
+        title:
+          type: string
+          description: Job post title
+        location:
+          type: [object, "null"]
+          description: Job post location
+        internal:
+          type: boolean
+          description: Whether this is an internal job post
+        external:
+          type: boolean
+          description: Whether this is an external job post
+        active:
+          type: boolean
+          description: Whether the job post is active
+        live:
+          type: boolean
+          description: Whether the job post is live
+        first_published_at:
+          type: [string, "null"]
+          format: date-time
+          description: When the job post was first published
+        job_id:
+          type: integer
+          description: Associated job ID
+        content:
+          type: [string, "null"]
+          description: Job post content/description
+        internal_content:
+          type: [string, "null"]
+          description: Internal job post content
+        updated_at:
+          type: string
+          format: date-time
+          description: When the job post was last updated
+        created_at:
+          type: string
+          format: date-time
+          description: When the job post was created
+        demographic_question_set_id:
+          type: [integer, "null"]
+          description: Demographic question set ID
+        questions:
+          type: array
+          items:
+            type: object
+          description: Application questions
+
+    Source:
+      type: object
+      x-airbyte-entity-name: sources
+      description: Greenhouse source object
+      properties:
+        id:
+          type: integer
+          description: Unique source identifier
+        name:
+          type: string
+          description: Source name
+        type:
+          type: [object, "null"]
+          description: Source type information
+
+    ScheduledInterview:
+      type: object
+      x-airbyte-entity-name: scheduled_interviews
+      description: Greenhouse scheduled interview object
+      properties:
+        id:
+          type: integer
+          description: Unique scheduled interview identifier
+        application_id:
+          type: integer
+          description: Associated application ID
+        external_event_id:
+          type: [string, "null"]
+          description: External calendar event ID
+        created_at:
+          type: string
+          format: date-time
+          description: When the interview was created
+        updated_at:
+          type: string
+          format: date-time
+          description: When the interview was last updated
+        start:
+          type: [object, "null"]
+          description: Interview start time details
+        end:
+          type: [object, "null"]
+          description: Interview end time details
+        location:
+          type: [string, "null"]
+          description: Interview location
+        video_conferencing_url:
+          type: [string, "null"]
+          description: Video conferencing URL
+        status:
+          type: string
+          description: Interview status
+        interview:
+          type: [object, "null"]
+          description: Interview details
+        organizer:
+          type: [object, "null"]
+          description: Interview organizer
+        interviewers:
+          type: array
+          items:
+            type: object
+          description: List of interviewers
+
+    Attachment:
+      type: object
+      description: File attachment (resume, cover letter, etc.)
+      properties:
+        filename:
+          type: string
+          description: Name of the attached file
+        url:
+          type: string
+          format: uri
+          description: |
+            Temporary signed AWS S3 URL to download the file.
+            This URL expires within 7 days - download immediately after retrieval.
+        type:
+          type: string
+          enum: [resume, cover_letter, admin_only, take_home_test, offer_packet, offer_letter, signed_offer_letter, other]
+          description: Type of attachment
+        created_at:
+          type: string
+          format: date-time
+          description: When the attachment was uploaded
