@@ -4,7 +4,7 @@ greenhouse connector.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, overload
+from typing import TYPE_CHECKING, Any, AsyncIterator, overload
 try:
     from typing import Literal
 except ImportError:
@@ -13,12 +13,27 @@ except ImportError:
 from pathlib import Path
 
 from .types import (
+    ApplicationAttachmentDownloadParams,
     ApplicationsGetParams,
     ApplicationsListParams,
+    CandidateAttachmentDownloadParams,
     CandidatesGetParams,
     CandidatesListParams,
+    DepartmentsGetParams,
+    DepartmentsListParams,
+    JobPostsGetParams,
+    JobPostsListParams,
     JobsGetParams,
     JobsListParams,
+    OffersGetParams,
+    OffersListParams,
+    OfficesGetParams,
+    OfficesListParams,
+    ScheduledInterviewsGetParams,
+    ScheduledInterviewsListParams,
+    SourcesListParams,
+    UsersGetParams,
+    UsersListParams,
 )
 
 if TYPE_CHECKING:
@@ -30,7 +45,13 @@ from .models import (
     GreenhouseExecuteResultWithMeta,
     Application,
     Candidate,
+    Department,
     Job,
+    JobPost,
+    Offer,
+    Office,
+    ScheduledInterview,
+    User,
 )
 
 
@@ -53,6 +74,21 @@ class GreenhouseConnector:
         ("applications", "get"): False,
         ("jobs", "list"): False,
         ("jobs", "get"): False,
+        ("offers", "list"): False,
+        ("offers", "get"): False,
+        ("users", "list"): False,
+        ("users", "get"): False,
+        ("departments", "list"): False,
+        ("departments", "get"): False,
+        ("offices", "list"): False,
+        ("offices", "get"): False,
+        ("job_posts", "list"): False,
+        ("job_posts", "get"): False,
+        ("sources", "list"): False,
+        ("scheduled_interviews", "list"): False,
+        ("scheduled_interviews", "get"): False,
+        ("application_attachment", "download"): False,
+        ("candidate_attachment", "download"): False,
     }
 
     def __init__(
@@ -140,6 +176,15 @@ class GreenhouseConnector:
         self.candidates = CandidatesQuery(self)
         self.applications = ApplicationsQuery(self)
         self.jobs = JobsQuery(self)
+        self.offers = OffersQuery(self)
+        self.users = UsersQuery(self)
+        self.departments = DepartmentsQuery(self)
+        self.offices = OfficesQuery(self)
+        self.job_posts = JobPostsQuery(self)
+        self.sources = SourcesQuery(self)
+        self.scheduled_interviews = ScheduledInterviewsQuery(self)
+        self.application_attachment = ApplicationAttachmentQuery(self)
+        self.candidate_attachment = CandidateAttachmentQuery(self)
 
     @classmethod
     def get_default_config_path(cls) -> Path:
@@ -195,6 +240,126 @@ class GreenhouseConnector:
         action: Literal["get"],
         params: "JobsGetParams"
     ) -> "Job": ...
+
+    @overload
+    async def execute(
+        self,
+        entity: Literal["offers"],
+        action: Literal["list"],
+        params: "OffersListParams"
+    ) -> "dict[str, Any]": ...
+
+    @overload
+    async def execute(
+        self,
+        entity: Literal["offers"],
+        action: Literal["get"],
+        params: "OffersGetParams"
+    ) -> "Offer": ...
+
+    @overload
+    async def execute(
+        self,
+        entity: Literal["users"],
+        action: Literal["list"],
+        params: "UsersListParams"
+    ) -> "dict[str, Any]": ...
+
+    @overload
+    async def execute(
+        self,
+        entity: Literal["users"],
+        action: Literal["get"],
+        params: "UsersGetParams"
+    ) -> "User": ...
+
+    @overload
+    async def execute(
+        self,
+        entity: Literal["departments"],
+        action: Literal["list"],
+        params: "DepartmentsListParams"
+    ) -> "dict[str, Any]": ...
+
+    @overload
+    async def execute(
+        self,
+        entity: Literal["departments"],
+        action: Literal["get"],
+        params: "DepartmentsGetParams"
+    ) -> "Department": ...
+
+    @overload
+    async def execute(
+        self,
+        entity: Literal["offices"],
+        action: Literal["list"],
+        params: "OfficesListParams"
+    ) -> "dict[str, Any]": ...
+
+    @overload
+    async def execute(
+        self,
+        entity: Literal["offices"],
+        action: Literal["get"],
+        params: "OfficesGetParams"
+    ) -> "Office": ...
+
+    @overload
+    async def execute(
+        self,
+        entity: Literal["job_posts"],
+        action: Literal["list"],
+        params: "JobPostsListParams"
+    ) -> "dict[str, Any]": ...
+
+    @overload
+    async def execute(
+        self,
+        entity: Literal["job_posts"],
+        action: Literal["get"],
+        params: "JobPostsGetParams"
+    ) -> "JobPost": ...
+
+    @overload
+    async def execute(
+        self,
+        entity: Literal["sources"],
+        action: Literal["list"],
+        params: "SourcesListParams"
+    ) -> "dict[str, Any]": ...
+
+    @overload
+    async def execute(
+        self,
+        entity: Literal["scheduled_interviews"],
+        action: Literal["list"],
+        params: "ScheduledInterviewsListParams"
+    ) -> "dict[str, Any]": ...
+
+    @overload
+    async def execute(
+        self,
+        entity: Literal["scheduled_interviews"],
+        action: Literal["get"],
+        params: "ScheduledInterviewsGetParams"
+    ) -> "ScheduledInterview": ...
+
+    @overload
+    async def execute(
+        self,
+        entity: Literal["application_attachment"],
+        action: Literal["download"],
+        params: "ApplicationAttachmentDownloadParams"
+    ) -> "AsyncIterator[bytes]": ...
+
+    @overload
+    async def execute(
+        self,
+        entity: Literal["candidate_attachment"],
+        action: Literal["download"],
+        params: "CandidateAttachmentDownloadParams"
+    ) -> "AsyncIterator[bytes]": ...
 
 
     @overload
@@ -465,4 +630,616 @@ class JobsQuery:
         result = await self._connector.execute("jobs", "get", params)
         return result
 
+
+
+class OffersQuery:
+    """
+    Query class for Offers entity operations.
+    """
+
+    def __init__(self, connector: GreenhouseConnector):
+        """Initialize query with connector reference."""
+        self._connector = connector
+
+    async def list(
+        self,
+        per_page: int | None = None,
+        page: int | None = None,
+        created_before: str | None = None,
+        created_after: str | None = None,
+        resolved_after: str | None = None,
+        **kwargs
+    ) -> dict[str, Any]:
+        """
+        Returns a paginated list of all offers
+
+        Args:
+            per_page: Number of items to return per page (max 500)
+            page: Page number for pagination
+            created_before: Filter by offers created before this timestamp
+            created_after: Filter by offers created after this timestamp
+            resolved_after: Filter by offers resolved after this timestamp
+            **kwargs: Additional parameters
+
+        Returns:
+            dict[str, Any]
+        """
+        params = {k: v for k, v in {
+            "per_page": per_page,
+            "page": page,
+            "created_before": created_before,
+            "created_after": created_after,
+            "resolved_after": resolved_after,
+            **kwargs
+        }.items() if v is not None}
+
+        result = await self._connector.execute("offers", "list", params)
+        return result
+
+
+
+    async def get(
+        self,
+        id: str | None = None,
+        **kwargs
+    ) -> Offer:
+        """
+        Get a single offer by ID
+
+        Args:
+            id: Offer ID
+            **kwargs: Additional parameters
+
+        Returns:
+            Offer
+        """
+        params = {k: v for k, v in {
+            "id": id,
+            **kwargs
+        }.items() if v is not None}
+
+        result = await self._connector.execute("offers", "get", params)
+        return result
+
+
+
+class UsersQuery:
+    """
+    Query class for Users entity operations.
+    """
+
+    def __init__(self, connector: GreenhouseConnector):
+        """Initialize query with connector reference."""
+        self._connector = connector
+
+    async def list(
+        self,
+        per_page: int | None = None,
+        page: int | None = None,
+        created_before: str | None = None,
+        created_after: str | None = None,
+        updated_before: str | None = None,
+        updated_after: str | None = None,
+        **kwargs
+    ) -> dict[str, Any]:
+        """
+        Returns a paginated list of all users
+
+        Args:
+            per_page: Number of items to return per page (max 500)
+            page: Page number for pagination
+            created_before: Filter by users created before this timestamp
+            created_after: Filter by users created after this timestamp
+            updated_before: Filter by users updated before this timestamp
+            updated_after: Filter by users updated after this timestamp
+            **kwargs: Additional parameters
+
+        Returns:
+            dict[str, Any]
+        """
+        params = {k: v for k, v in {
+            "per_page": per_page,
+            "page": page,
+            "created_before": created_before,
+            "created_after": created_after,
+            "updated_before": updated_before,
+            "updated_after": updated_after,
+            **kwargs
+        }.items() if v is not None}
+
+        result = await self._connector.execute("users", "list", params)
+        return result
+
+
+
+    async def get(
+        self,
+        id: str | None = None,
+        **kwargs
+    ) -> User:
+        """
+        Get a single user by ID
+
+        Args:
+            id: User ID
+            **kwargs: Additional parameters
+
+        Returns:
+            User
+        """
+        params = {k: v for k, v in {
+            "id": id,
+            **kwargs
+        }.items() if v is not None}
+
+        result = await self._connector.execute("users", "get", params)
+        return result
+
+
+
+class DepartmentsQuery:
+    """
+    Query class for Departments entity operations.
+    """
+
+    def __init__(self, connector: GreenhouseConnector):
+        """Initialize query with connector reference."""
+        self._connector = connector
+
+    async def list(
+        self,
+        per_page: int | None = None,
+        page: int | None = None,
+        **kwargs
+    ) -> dict[str, Any]:
+        """
+        Returns a paginated list of all departments
+
+        Args:
+            per_page: Number of items to return per page (max 500)
+            page: Page number for pagination
+            **kwargs: Additional parameters
+
+        Returns:
+            dict[str, Any]
+        """
+        params = {k: v for k, v in {
+            "per_page": per_page,
+            "page": page,
+            **kwargs
+        }.items() if v is not None}
+
+        result = await self._connector.execute("departments", "list", params)
+        return result
+
+
+
+    async def get(
+        self,
+        id: str | None = None,
+        **kwargs
+    ) -> Department:
+        """
+        Get a single department by ID
+
+        Args:
+            id: Department ID
+            **kwargs: Additional parameters
+
+        Returns:
+            Department
+        """
+        params = {k: v for k, v in {
+            "id": id,
+            **kwargs
+        }.items() if v is not None}
+
+        result = await self._connector.execute("departments", "get", params)
+        return result
+
+
+
+class OfficesQuery:
+    """
+    Query class for Offices entity operations.
+    """
+
+    def __init__(self, connector: GreenhouseConnector):
+        """Initialize query with connector reference."""
+        self._connector = connector
+
+    async def list(
+        self,
+        per_page: int | None = None,
+        page: int | None = None,
+        **kwargs
+    ) -> dict[str, Any]:
+        """
+        Returns a paginated list of all offices
+
+        Args:
+            per_page: Number of items to return per page (max 500)
+            page: Page number for pagination
+            **kwargs: Additional parameters
+
+        Returns:
+            dict[str, Any]
+        """
+        params = {k: v for k, v in {
+            "per_page": per_page,
+            "page": page,
+            **kwargs
+        }.items() if v is not None}
+
+        result = await self._connector.execute("offices", "list", params)
+        return result
+
+
+
+    async def get(
+        self,
+        id: str | None = None,
+        **kwargs
+    ) -> Office:
+        """
+        Get a single office by ID
+
+        Args:
+            id: Office ID
+            **kwargs: Additional parameters
+
+        Returns:
+            Office
+        """
+        params = {k: v for k, v in {
+            "id": id,
+            **kwargs
+        }.items() if v is not None}
+
+        result = await self._connector.execute("offices", "get", params)
+        return result
+
+
+
+class JobPostsQuery:
+    """
+    Query class for JobPosts entity operations.
+    """
+
+    def __init__(self, connector: GreenhouseConnector):
+        """Initialize query with connector reference."""
+        self._connector = connector
+
+    async def list(
+        self,
+        per_page: int | None = None,
+        page: int | None = None,
+        live: bool | None = None,
+        active: bool | None = None,
+        **kwargs
+    ) -> dict[str, Any]:
+        """
+        Returns a paginated list of all job posts
+
+        Args:
+            per_page: Number of items to return per page (max 500)
+            page: Page number for pagination
+            live: Filter by live status
+            active: Filter by active status
+            **kwargs: Additional parameters
+
+        Returns:
+            dict[str, Any]
+        """
+        params = {k: v for k, v in {
+            "per_page": per_page,
+            "page": page,
+            "live": live,
+            "active": active,
+            **kwargs
+        }.items() if v is not None}
+
+        result = await self._connector.execute("job_posts", "list", params)
+        return result
+
+
+
+    async def get(
+        self,
+        id: str | None = None,
+        **kwargs
+    ) -> JobPost:
+        """
+        Get a single job post by ID
+
+        Args:
+            id: Job Post ID
+            **kwargs: Additional parameters
+
+        Returns:
+            JobPost
+        """
+        params = {k: v for k, v in {
+            "id": id,
+            **kwargs
+        }.items() if v is not None}
+
+        result = await self._connector.execute("job_posts", "get", params)
+        return result
+
+
+
+class SourcesQuery:
+    """
+    Query class for Sources entity operations.
+    """
+
+    def __init__(self, connector: GreenhouseConnector):
+        """Initialize query with connector reference."""
+        self._connector = connector
+
+    async def list(
+        self,
+        per_page: int | None = None,
+        page: int | None = None,
+        **kwargs
+    ) -> dict[str, Any]:
+        """
+        Returns a paginated list of all sources
+
+        Args:
+            per_page: Number of items to return per page (max 500)
+            page: Page number for pagination
+            **kwargs: Additional parameters
+
+        Returns:
+            dict[str, Any]
+        """
+        params = {k: v for k, v in {
+            "per_page": per_page,
+            "page": page,
+            **kwargs
+        }.items() if v is not None}
+
+        result = await self._connector.execute("sources", "list", params)
+        return result
+
+
+
+class ScheduledInterviewsQuery:
+    """
+    Query class for ScheduledInterviews entity operations.
+    """
+
+    def __init__(self, connector: GreenhouseConnector):
+        """Initialize query with connector reference."""
+        self._connector = connector
+
+    async def list(
+        self,
+        per_page: int | None = None,
+        page: int | None = None,
+        created_before: str | None = None,
+        created_after: str | None = None,
+        updated_before: str | None = None,
+        updated_after: str | None = None,
+        starts_after: str | None = None,
+        ends_before: str | None = None,
+        **kwargs
+    ) -> dict[str, Any]:
+        """
+        Returns a paginated list of all scheduled interviews
+
+        Args:
+            per_page: Number of items to return per page (max 500)
+            page: Page number for pagination
+            created_before: Filter by interviews created before this timestamp
+            created_after: Filter by interviews created after this timestamp
+            updated_before: Filter by interviews updated before this timestamp
+            updated_after: Filter by interviews updated after this timestamp
+            starts_after: Filter by interviews starting after this timestamp
+            ends_before: Filter by interviews ending before this timestamp
+            **kwargs: Additional parameters
+
+        Returns:
+            dict[str, Any]
+        """
+        params = {k: v for k, v in {
+            "per_page": per_page,
+            "page": page,
+            "created_before": created_before,
+            "created_after": created_after,
+            "updated_before": updated_before,
+            "updated_after": updated_after,
+            "starts_after": starts_after,
+            "ends_before": ends_before,
+            **kwargs
+        }.items() if v is not None}
+
+        result = await self._connector.execute("scheduled_interviews", "list", params)
+        return result
+
+
+
+    async def get(
+        self,
+        id: str | None = None,
+        **kwargs
+    ) -> ScheduledInterview:
+        """
+        Get a single scheduled interview by ID
+
+        Args:
+            id: Scheduled Interview ID
+            **kwargs: Additional parameters
+
+        Returns:
+            ScheduledInterview
+        """
+        params = {k: v for k, v in {
+            "id": id,
+            **kwargs
+        }.items() if v is not None}
+
+        result = await self._connector.execute("scheduled_interviews", "get", params)
+        return result
+
+
+
+class ApplicationAttachmentQuery:
+    """
+    Query class for ApplicationAttachment entity operations.
+    """
+
+    def __init__(self, connector: GreenhouseConnector):
+        """Initialize query with connector reference."""
+        self._connector = connector
+
+    async def download(
+        self,
+        attachment_index: str,
+        id: str | None = None,
+        range_header: str | None = None,
+        **kwargs
+    ) -> AsyncIterator[bytes]:
+        """
+        Downloads an attachment (resume, cover letter, etc.) for an application by index.
+The attachment URL is a temporary signed AWS S3 URL that expires within 7 days.
+Files should be downloaded immediately after retrieval.
+
+
+        Args:
+            id: Application ID
+            attachment_index: Index of the attachment to download (0-based)
+            range_header: Optional Range header for partial downloads (e.g., 'bytes=0-99')
+            **kwargs: Additional parameters
+
+        Returns:
+            AsyncIterator[bytes]
+        """
+        params = {k: v for k, v in {
+            "id": id,
+            "attachment_index": attachment_index,
+            "range_header": range_header,
+            **kwargs
+        }.items() if v is not None}
+
+        result = await self._connector.execute("application_attachment", "download", params)
+        return result
+
+
+    async def download_local(
+        self,
+        attachment_index: str,
+        path: str,
+        id: str | None = None,
+        range_header: str | None = None,
+        **kwargs
+    ) -> Path:
+        """
+        Downloads an attachment (resume, cover letter, etc.) for an application by index.
+The attachment URL is a temporary signed AWS S3 URL that expires within 7 days.
+Files should be downloaded immediately after retrieval.
+ and save to file.
+
+        Args:
+            id: Application ID
+            attachment_index: Index of the attachment to download (0-based)
+            range_header: Optional Range header for partial downloads (e.g., 'bytes=0-99')
+            path: File path to save downloaded content
+            **kwargs: Additional parameters
+
+        Returns:
+            str: Path to the downloaded file
+        """
+        from ._vendored.connector_sdk import save_download
+
+        # Get the async iterator
+        content_iterator = await self.download(
+            id=id,
+            attachment_index=attachment_index,
+            range_header=range_header,
+            **kwargs
+        )
+
+        return await save_download(content_iterator, path)
+
+
+class CandidateAttachmentQuery:
+    """
+    Query class for CandidateAttachment entity operations.
+    """
+
+    def __init__(self, connector: GreenhouseConnector):
+        """Initialize query with connector reference."""
+        self._connector = connector
+
+    async def download(
+        self,
+        attachment_index: str,
+        id: str | None = None,
+        range_header: str | None = None,
+        **kwargs
+    ) -> AsyncIterator[bytes]:
+        """
+        Downloads an attachment (resume, cover letter, etc.) for a candidate by index.
+The attachment URL is a temporary signed AWS S3 URL that expires within 7 days.
+Files should be downloaded immediately after retrieval.
+
+
+        Args:
+            id: Candidate ID
+            attachment_index: Index of the attachment to download (0-based)
+            range_header: Optional Range header for partial downloads (e.g., 'bytes=0-99')
+            **kwargs: Additional parameters
+
+        Returns:
+            AsyncIterator[bytes]
+        """
+        params = {k: v for k, v in {
+            "id": id,
+            "attachment_index": attachment_index,
+            "range_header": range_header,
+            **kwargs
+        }.items() if v is not None}
+
+        result = await self._connector.execute("candidate_attachment", "download", params)
+        return result
+
+
+    async def download_local(
+        self,
+        attachment_index: str,
+        path: str,
+        id: str | None = None,
+        range_header: str | None = None,
+        **kwargs
+    ) -> Path:
+        """
+        Downloads an attachment (resume, cover letter, etc.) for a candidate by index.
+The attachment URL is a temporary signed AWS S3 URL that expires within 7 days.
+Files should be downloaded immediately after retrieval.
+ and save to file.
+
+        Args:
+            id: Candidate ID
+            attachment_index: Index of the attachment to download (0-based)
+            range_header: Optional Range header for partial downloads (e.g., 'bytes=0-99')
+            path: File path to save downloaded content
+            **kwargs: Additional parameters
+
+        Returns:
+            str: Path to the downloaded file
+        """
+        from ._vendored.connector_sdk import save_download
+
+        # Get the async iterator
+        content_iterator = await self.download(
+            id=id,
+            attachment_index=attachment_index,
+            range_header=range_header,
+            **kwargs
+        )
+
+        return await save_download(content_iterator, path)
 
