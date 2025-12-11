@@ -1,13 +1,26 @@
 name: "Notification to Slack (generic Action)"
+description: |
+  Send a notification to a Slack channel.
+  
+  For local testing, you can run the script directly:
+    export SLACK_BOT_TOKEN=xoxb-...
+    python .github/actions/notification-to-slack/notify_slack.py \
+      --channel C07PPP45S78 \
+      --message-body '[{"type": "section", "text": {"type": "mrkdwn", "text": "Hello!"}}]'
+
 inputs:
   channel:
     required: true
+    description: "Slack channel ID (e.g., C07PPP45S78)"
   message_body:
     required: true
+    description: "JSON array of Slack blocks"
   slackbot_token:
     required: true
+    description: "Slack bot token"
   message_text:
     required: false
+    description: "Optional plain text message (fallback for notifications)"
 
 runs:
   using: "composite"
@@ -19,32 +32,11 @@ runs:
         pip install slack_sdk termcolor
 
     - name: Send notification
-      uses: jannekem/run-python-script-action@2f75b0640b8ebbf24de58810e95e0220e5fd323f # v1.5
-      with:
-        script: |
-          import json
-          from slack_sdk import WebClient
-          from slack_sdk.errors import SlackApiError
-          from termcolor import cprint
-
-          raw_message = """${{ inputs.message_body }}"""
-          message_body = json.loads(raw_message, strict=False)
-
-          raw_text = """${{ inputs.message_text }}""".strip()
-          if raw_text:
-            text = raw_text
-          elif message_body:
-            text = message_body[0].get("text", {}).get("text", "")
-          else:
-            text = ""
-
-          print(json.dumps(message_body, indent=4))
-
-          client = WebClient(token="${{ inputs.slackbot_token }}")
-          try:
-            client.chat_postMessage(channel="${{ inputs.channel }}", text=text, blocks=message_body)
-          except SlackApiError as error:
-            print()
-            cprint('Error on calling the Slack API!', 'red')
-            cprint('--------------------------------------------------------------------------------------', 'red')
-            print(error)
+      shell: bash
+      env:
+        SLACK_BOT_TOKEN: ${{ inputs.slackbot_token }}
+      run: |
+        python "$GITHUB_ACTION_PATH/notify_slack.py" \
+          --channel "${{ inputs.channel }}" \
+          --message-body '${{ inputs.message_body }}' \
+          --message-text "${{ inputs.message_text }}"
