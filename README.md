@@ -1,11 +1,28 @@
-# AI Connectors
+<div align="center">
+  <a href="https://airbyte.ai/">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset=".github/images/logo-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset=".github/images/logo-light.svg">
+      <img alt="Airbyte Logo" src=".github/images/logo-dark.svg" width="80%">
+    </picture>
+  </a>
+</div>
 
-[![License](https://img.shields.io/badge/License-Elastic_2.0-blue.svg)](LICENSE)
-[![Slack](https://img.shields.io/badge/Slack-Join_Community-4A154B?logo=slack&logoColor=white)](https://slack.airbyte.com/)
+<div align="center">
+  <h3>A unified interface for AI agents to access data.</h3>
+</div>
+
+[![Python](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![Publish Connectors](https://github.com/airbytehq/airbyte-ai-connectors/actions/workflows/publish.yml/badge.svg)](https://github.com/airbytehq/airbyte-ai-connectors/actions/workflows/publish.yml)
-[![Airbyte Stars](https://img.shields.io/github/stars/airbytehq/airbyte?style=social)](https://github.com/airbytehq/airbyte)
+[![License](https://img.shields.io/badge/License-Elastic_2.0-blue.svg)](LICENSE)
+[![Website](https://img.shields.io/badge/Website-airbyte.ai-06041B)](https://airbyte.ai)[![Airbyte Stars](https://img.shields.io/github/stars/airbytehq/airbyte?style=social)](https://github.com/airbytehq/airbyte)
+[![Slack](https://img.shields.io/badge/Slack-Join_Community-4A154B?logo=slack&logoColor=white)](https://slack.airbyte.com/)
+[![Twitter Follow](https://img.shields.io/twitter/follow/airbytehq?style=social)](https://twitter.com/airbytehq)
 
-### A unified interface for AI agents to fetch your data.
+Brought to you with love by Airbyte 💜
+
+# Airbyte AI Connectors
+
 Airbyte AI Connectors are packages that let AI agents call third‑party APIs through strongly typed, well‑documented tools. Each connector is a standalone Python package that you can use directly in your app, plug into an agent framework, or expose through MCP (coming soon) and APIs(coming soon).
 
 ## What this repo contains
