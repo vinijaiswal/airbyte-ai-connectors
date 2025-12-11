@@ -1,4 +1,4 @@
-<div align="center">
+<div align="center" style="margin-bottom: 2rem">
   <a href="https://airbyte.ai/">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset=".github/images/logo-dark.svg">
@@ -8,16 +8,14 @@
   </a>
 </div>
 
-<div align="center">
-  <h3>A unified interface for AI agents to access data.</h3>
-</div>
-
 [![Python](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![Publish Connectors](https://github.com/airbytehq/airbyte-ai-connectors/actions/workflows/publish.yml/badge.svg)](https://github.com/airbytehq/airbyte-ai-connectors/actions/workflows/publish.yml)
 [![License](https://img.shields.io/badge/License-Elastic_2.0-blue.svg)](LICENSE)
 [![Airbyte Stars](https://img.shields.io/github/stars/airbytehq/airbyte?style=social)](https://github.com/airbytehq/airbyte)
 [![Slack](https://img.shields.io/badge/Slack-Join_Community-4A154B?logo=slack&logoColor=white)](https://slack.airbyte.com/)
 [![Twitter Follow](https://img.shields.io/twitter/follow/airbytehq?style=social)](https://twitter.com/airbytehq)
+
+## A unified interface for AI agents to access data
 
 Airbyte AI Connectors are packages that let AI agents call third‑party APIs through strongly typed, well‑documented tools. Each connector is a standalone Python package that you can use directly in your app, plug into an agent framework, or expose through MCP (coming soon) and APIs(coming soon).
 
