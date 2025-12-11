@@ -1,9 +1,30 @@
-# AI Connectors
-### A unified interface for AI agents to fetch your data.
-Airbyte AI Connectors are auto‑generated Python connector packages that let AI agents call third‑party APIs through strongly typed, well‑documented tools. Each connector is a standalone Python package that you can use directly in your app, plug into an agent framework, or expose through MCP (coming soon) and APIs(coming soon).
+<div align="center">
+  <a href="https://airbyte.ai/">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset=".github/images/logo-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset=".github/images/logo-light.svg">
+      <img alt="Airbyte Logo" src=".github/images/logo-dark.svg" width="80%">
+    </picture>
+  </a>
+</div>
+
+<div align="center">
+  <h3>A unified interface for AI agents to access data.</h3>
+</div>
+
+[![Python](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![Publish Connectors](https://github.com/airbytehq/airbyte-ai-connectors/actions/workflows/publish.yml/badge.svg)](https://github.com/airbytehq/airbyte-ai-connectors/actions/workflows/publish.yml)
+[![License](https://img.shields.io/badge/License-Elastic_2.0-blue.svg)](LICENSE)
+[![Airbyte Stars](https://img.shields.io/github/stars/airbytehq/airbyte?style=social)](https://github.com/airbytehq/airbyte)
+[![Slack](https://img.shields.io/badge/Slack-Join_Community-4A154B?logo=slack&logoColor=white)](https://slack.airbyte.com/)
+[![Twitter Follow](https://img.shields.io/twitter/follow/airbytehq?style=social)](https://twitter.com/airbytehq)
+
+# Airbyte AI Connectors
+
+Airbyte AI Connectors are packages that let AI agents call third‑party APIs through strongly typed, well‑documented tools. Each connector is a standalone Python package that you can use directly in your app, plug into an agent framework, or expose through MCP (coming soon) and APIs(coming soon).
 
 ## What this repo contains
-* Auto‑generated Python SDKs for specific SaaS APIs (for example Gong, Stripe, GitHub). 
+* Python SDKs for specific SaaS APIs (for example Gong, Stripe, GitHub). 
 * A consistent connector layout so you can understand and extend any connector quickly. 
 * Ready‑to-use clients that validate auth, handle schemas, and expose typed methods for each operation.
 
@@ -99,3 +120,6 @@ We are actively expanding AI Connectors. Coming soon:
 ## Contributing / Feedback
 We actively welcome feedback, ideas, and bug reports. 
 If you're building AI agents with Airbyte AI Connectors and want to share ideas or get help, join our community on [slack](https://airbytehq.slack.com/ssb/redirect#/shared-invite/email). We’d love to hear what you're building and what connectors or capabilities you’d like to see next.
+
+
+Brought to you with love by Airbyte 💜
